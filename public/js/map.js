@@ -1,6 +1,6 @@
 mapboxgl.accessToken = mapToken;
 const map = new mapboxgl.Map({
-    style: 'mapbox://styles/mapbox/satellite-streets-v12', // style URL
+    style: 'mapbox://styles/mapbox/outdoors-v12', // style URL
     container: 'map', // container ID
     center: listing.geometry.coordinates, // starting position [lng, lat]. Note that lat must be set between -90 and 90
     zoom: 10 // starting zoom
