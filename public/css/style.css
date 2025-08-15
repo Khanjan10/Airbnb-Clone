@@ -58,11 +58,9 @@ body{
 .f-info{
     display: flex;
     flex-direction: row;
-    height: 8rem;
+    height: 5rem;
     background-color: #ebebeb;
-    /* flex-wrap: wrap; */
-    justify-content: center;
-    /* align-items: space-between; */
+    justify-content: space-evenly;
     text-align: center;
 }
 
@@ -92,6 +90,21 @@ body{
     border: none !important;
     margin-bottom: 2rem;
 }
+
+.card-info {
+    display: flex !important;
+    justify-content: space-evenly;
+    gap: 1rem;
+    margin-top: 5rem !important;
+}
+
+.card-info-img {
+    border-radius: 1rem !important;
+    width: 40% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+}
+
 
 .card-img-top{
     border-radius: 1rem !important;
