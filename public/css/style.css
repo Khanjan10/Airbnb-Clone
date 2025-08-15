@@ -95,7 +95,7 @@ body{
     display: flex !important;
     justify-content: space-evenly;
     gap: 1rem;
-    margin-top: 5rem !important;
+    margin-top: 4rem !important;
 }
 
 .card-info-img {
@@ -103,6 +103,17 @@ body{
     width: 40% !important;
     height: 100% !important;
     object-fit: cover !important;
+}
+
+@media (max-width: 768px) {
+    .card-info {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .card-info-img {
+        width: 100% !important;
+    }
 }
 
 
@@ -152,14 +163,13 @@ body{
 
 /* Show Page */
 
-.show-img{
-    height: 30vh;
-}
+/* .show-img{
+    /* height: 30vh; */
 
-.show-card{
+/* .show-card{
     padding-left: 0;
     padding-right: 0;
-}
+} */
 
 
 /* Map */
