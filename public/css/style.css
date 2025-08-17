@@ -1,5 +1,10 @@
+:root {
+  --color-primary: #ee4650;
+}
+
+
 body{
-    font-family: 'Plus Jakarta Sans', sans-serif !important;
+    font-family: 'Georgia','Plus Jakarta Sans', sans-serif !important;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
@@ -39,6 +44,14 @@ body{
     color: black !important;
 }
 
+.navbar-nav {
+    font-weight: 500;
+}
+
+.nav-link:hover {
+    color: var(--color-primary) !important;
+}
+
 .search-input {
     border-radius: 25px !important;
     padding: 0.5rem 2rem !important;
@@ -72,14 +85,15 @@ body{
 .f-info{
     display: flex;
     flex-direction: row;
-    height: 5rem;
-    background-color: #ebebeb;
+    height: 4rem;
+    background-color: var(--color-primary);
     justify-content: space-evenly;
     text-align: center;
 }
 
 .f-info-links, .f-info-socials, .f-info-brand{
     width: 100%;
+    color: white;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -92,11 +106,19 @@ body{
 
 .f-info-links a {
     text-decoration: none;
-    color: #222222;
+    color: white;
 }
 
-.f-info-links a:hover{
-    text-decoration: underline;
+
+/* Login */
+.login-btn {
+    background-color: var(--color-primary) !important;
+    color: white !important;
+}
+
+.sign-up-btn{
+    background-color: var(--color-primary) !important;
+    color: white !important;
 }
 
 /* Cards */
@@ -142,7 +164,7 @@ body{
 }
 
 .card-text{
-    font-weight: 400 !important;
+    font-weight: 500 !important;
 }
 
 .listing-link{
@@ -274,6 +296,24 @@ body{
   background-color: #fff;         /* white background for contrast */
 }
 
+.search-input {
+  border-radius: 25px !important;
+  padding: 0.5rem 2.5rem 0.5rem 1rem !important; /* extra space on right */
+}
+
+.search-icon {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-primary);
+  cursor: pointer;
+}
+
+
+.form-control {
+    line-height: 2 !important;
+}
 
 .form-check-label{
     width: fit-content;
