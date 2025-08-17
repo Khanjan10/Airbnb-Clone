@@ -1,91 +1,100 @@
 const Listing = require("../models/listing.js");
 const mbxGeocoding = require('@mapbox/mapbox-sdk/services/geocoding');
 const mapToken = process.env.MAP_TOKEN;
-
 const geocodingClient = mbxGeocoding({ accessToken: mapToken });
 
-
+// Index
 module.exports.index = async (req, res) => {
+  try {
     const allListings = await Listing.find({});
-    res.render("listings/index.ejs", { allListings });
+    res.render("listings/index", { allListings });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error fetching listings");
+  }
 };
 
+// New Form
 module.exports.renderNewForm = (req, res) => {
     res.render("listings/new.ejs");
 };
 
+// Show
 module.exports.showListing = async (req, res, next) => {
     try {
         const { id } = req.params;
         const listing = await Listing.findById(id)
-            .populate( { path: "reviews", populate: {path: "author"} })
+            .populate({ path: "reviews", populate: { path: "author" } })
             .populate("owner");
+
         if (!listing) {
             req.flash("error", "Listing does not exist");
-            res.redirect("/listings");
+            return res.redirect("/");
         }
-        console.log(listing);
+
         res.render("listings/show.ejs", { listing });
     } catch (err) {
-        next(err); // Pass the error to the error handling middleware
+        next(err);
     }
 };
 
+// Create
 module.exports.createListing = async (req, res, next) => {
-    let response = await geocodingClient.forwardGeocode ({
+    let response = await geocodingClient.forwardGeocode({
         query: req.body.listing.location,
-        limit: 1,   
-    })
-    .send()
-    // .then(response => {
-    //     const match = response.body;
-    // });
-    //console.log(response.body.features[0].geometry);
-    //res.send("Done");
+        limit: 1,
+    }).send();
 
     let url = req.file.path;
     let filename = req.file.filename;
     const newListing = new Listing(req.body.listing);
     newListing.owner = req.user._id;
-    newListing.image = {url, filename};
-
+    newListing.image = { url, filename };
     newListing.geometry = response.body.features[0].geometry;
 
-    let savedListing = await newListing.save();
-    console.log(savedListing);
+    await newListing.save();
     req.flash("success", "New Listing Created");
-    res.redirect("/listings");
+    res.redirect("/");
 };
 
+// Edit Form
 module.exports.renderEditForm = async (req, res) => {
-    let {id} = req.params;
+    let { id } = req.params;
     const listing = await Listing.findById(id);
+
+    if (!listing) {
+        req.flash("error", "Listing not found");
+        return res.redirect("/");
+    }
+
     let originalImageUrl = listing.image.url;
-    originalImageUrl = originalImageUrl.replace("upload", "/upload/h_250, w_250");
-    res.render("listings/edit.ejs", {listing, originalImageUrl});
+    originalImageUrl = originalImageUrl.replace("upload", "/upload/h_250,w_250");
+
+    res.render("listings/edit.ejs", { listing, originalImageUrl });
 };
 
+// Update
 module.exports.updateListing = async (req, res) => {
-    let {id}=req.params;
+    let { id } = req.params;
     let listing = await Listing.findById(id);
-    
-    // Update the listing with new data from the request body
-    await Listing.findByIdAndUpdate(id, {...req.body.listing});
 
-    if(typeof req.file!== "undefined") {
+    await Listing.findByIdAndUpdate(id, { ...req.body.listing });
+
+    if (typeof req.file !== "undefined") {
         let url = req.file.path;
         let filename = req.file.filename;
-        listing.image = {url, filename};
+        listing.image = { url, filename };
         await listing.save();
     }
-    
+
     req.flash("success", "Listing Updated");
-    res.redirect(`/listings/${id}`);
+    res.redirect(`/${id}`);
 };
 
-module.exports.destroyListing = async(req, res) => {
-    let {id}= req.params;
+// Delete
+module.exports.destroyListing = async (req, res) => {
+    let { id } = req.params;
     await Listing.findByIdAndDelete(id);
     req.flash("success", "Listing Deleted");
-    res.redirect("/listings");
+    res.redirect("/");
 };

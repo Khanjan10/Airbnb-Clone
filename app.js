@@ -1,37 +1,34 @@
-if(process.env.NODE_ENV != 'production') {
+if (process.env.NODE_ENV != 'production') {
     require('dotenv').config();
 }
-// console.log(process.env.secret);
 
 const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
-//const Listing = require("./models/listing.js");
 const path = require("path");
-const methodOverride= require("method-override");
+const methodOverride = require("method-override");
 const ejsMate = require("ejs-mate");
-//const wrapAsync = require("./utils/wrapAsync.js");
 const ExpressError = require("./utils/ExpressError.js");
-//const {listingSchema, reviewSchema} = require("./schema.js");
-//const Review = require("./models/review.js");
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
 const MongoStore = require('connect-mongo');
-
 const flash = require("connect-flash");
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const User = require("./models/user.js");
+const allListings = require("./controllers/listings.js")
 
 const listingsRouter = require("./routes/listing.js");
 const reviewsRouter = require("./routes/review.js");
 const userRouter = require("./routes/user.js");
 
+const listingRoutes = require("./routes/listing");
+
 const dbUrl = process.env.ATLASDB_URL;
 
 main().then(() => {
     console.log("Connection successful");
-}) .catch((err) => {
+}).catch((err) => {
     console.log(err);
 });
 
@@ -39,15 +36,12 @@ async function main() {
     await mongoose.connect(dbUrl);
 }
 
-
-
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
-app.use(express.urlencoded({extended: true}));
+app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
 app.engine('ejs', ejsMate);
 app.use(express.static(path.join(__dirname, "/public")));
-
 app.use(express.static("public"));
 
 app.use(cookieParser("secretcode"));
@@ -76,12 +70,6 @@ const sessionOptions = {
     },
 };
 
-app.get("/", (req, res) => {
-    res.redirect("/listings");
-});
-
-
-
 app.use(session(sessionOptions));
 app.use(flash());
 
@@ -89,7 +77,6 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 passport.use(new LocalStrategy(User.authenticate()));
-
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
@@ -100,61 +87,26 @@ app.use((req, res, next) => {
     next();
 });
 
-app.get("/demouser", async (req, res) => {
-    let fakeUser = new User ({
-        email: "student@gmail.com",
-        username: "delta"
-    });
+// Default route → Home (Listings Index)
+app.use("/", listingRoutes);
 
-    let registeredUser = await User.register(fakeUser, "hello");
-    res.send(registeredUser);
-})
 
-app.use("/listings", listingsRouter);
-app.use("/listings/:id/reviews/", reviewsRouter);
+app.use("/", listingsRouter);
+app.use("/:id/reviews", reviewsRouter);
 app.use("/", userRouter);
-
-// app.get("/getcookies", (req, res) => {
-//     res.cookie("greet", "hello", {signed: true});
-//     res.send("Sent some cookies");
-// });
 
 app.get("/verify", (req, res) => {
     console.log(req.signedCookies);
     res.send("verified");
 });
 
-app.get("/greet", (req, res) => {
-    let {greet} = req.cookies;
-    res.send(`${greet}`);
-})
-
-
-
-
-
-// app.get("/testListing", async (req, res) => {
-//     let sampleListing = new Listing ({
-//         title: "New Villa",
-//         description: "Natural  view",
-//         price: 1200,
-//         location: "Goa",
-//         country: "India",
-//     });
-
-//     await sampleListing.save();
-//     console.log("Sample was saved");
-//     res.send("Successful");
-// });
-
 app.all("*", (req, res, next) => {
     next(new ExpressError(404, "Page Not Found"));
 });
 
 app.use((err, req, res, next) => {
-    let {status=500, message="Something went wrong"} = err;
-    res.status(status).render("error.ejs", {err});
-    //res.status(status).send(message);
+    let { status = 500, message = "Something went wrong" } = err;
+    res.status(status).render("error.ejs", { err });
 });
 
 app.listen(8080, () => {
